@@ -1,30 +1,38 @@
--- Question 1: Transforming to 1NF
-SELECT 
-    OrderID,
-    CustomerName,
-    value AS Product
-FROM 
-    ProductDetail
-CROSS APPLY STRING_SPLIT(Products, ',');
--- Question 2: Transforming to 2NF
--- First create Orders table
-CREATE TABLE Orders_2NF (
+-- Question 1
+CREATE TABLE ProductDetail_1NF (
+    OrderID INT,
+    CustomerName VARCHAR(100),
+    Product VARCHAR(100)
+);
+
+INSERT INTO ProductDetail_1NF VALUES (101, 'John Doe', 'Laptop');
+INSERT INTO ProductDetail_1NF VALUES (101, 'John Doe', 'Mouse');
+INSERT INTO ProductDetail_1NF VALUES (102, 'Jane Smith', 'Tablet');
+INSERT INTO ProductDetail_1NF VALUES (102, 'Jane Smith', 'Keyboard');
+INSERT INTO ProductDetail_1NF VALUES (102, 'Jane Smith', 'Mouse');
+INSERT INTO ProductDetail_1NF VALUES (103, 'Emily Clark', 'Phone');
+
+-- Question 2
+CREATE TABLE Orders (
     OrderID INT PRIMARY KEY,
     CustomerName VARCHAR(100)
 );
 
--- Then create OrderProducts table with foreign key
-CREATE TABLE OrderProducts_2NF (
+INSERT INTO Orders VALUES (101, 'John Doe');
+INSERT INTO Orders VALUES (102, 'Jane Smith');
+INSERT INTO Orders VALUES (103, 'Emily Clark');
+
+CREATE TABLE OrderProducts (
     OrderID INT,
-    Product VARCHAR(50),
+    Product VARCHAR(100),
     Quantity INT,
-    PRIMARY KEY (OrderID, Product),
-    FOREIGN KEY (OrderID) REFERENCES Orders_2NF(OrderID)
+    PRIMARY KEY (OrderID, Product),  
+    FOREIGN KEY (OrderID) REFERENCES Orders(OrderID)
 );
 
--- Insert data
-INSERT INTO Orders_2NF
-SELECT DISTINCT OrderID, CustomerName FROM OrderDetails;
-
-INSERT INTO OrderProducts_2NF
-SELECT OrderID, Product, Quantity FROM OrderDetails;
+INSERT INTO OrderProducts VALUES (101, 'Laptop', 2);
+INSERT INTO OrderProducts VALUES (101, 'Mouse', 1);
+INSERT INTO OrderProducts VALUES (102, 'Tablet', 3);
+INSERT INTO OrderProducts VALUES (102, 'Keyboard', 1);
+INSERT INTO OrderProducts VALUES (102, 'Mouse', 2);
+INSERT INTO OrderProducts VALUES (103, 'Phone', 1);
